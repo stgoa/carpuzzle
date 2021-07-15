@@ -131,7 +131,7 @@ class Board:
 			string += l1 + "\n"+ l2 + "\n" +l3 + "\n"
 		return string
 	
-class Recursive:
+class Solver:
 	def __init__(self, strategy, path=None, shape=(3,3)):
 
 		#read csv puzzle
@@ -180,21 +180,30 @@ class Recursive:
 # initialize the solver
 strategy = [(1,1), (0,1), (1,0), (1,2), (2,1), (0,0), (0,2) , (2,0), (2,2)]
 
+s = Solver(strategy,path = "data.tsv", shape=(3,3))
+
+# run
+s.depth_search()
+
+
+s.board.print_ids()
+print(s.board)
+
 # strategy.reverse()
 
-suma = 0
-n=1
-for i in range(n):
+# suma = 0
+# n=1
+# for i in range(n):
 
-	r = Recursive(strategy,path = "data.tsv", shape=(3,3))
+# 	r = Solver(strategy,path = "data.tsv", shape=(3,3))
 
-	# run
-	r.depth_search()
-	print(r.board)
+# 	# run
+# 	r.depth_search()
+# 	print(r.board)
 
-	suma += r.counter
+# 	suma += r.counter
 
-print(suma/n)
+# print(suma/n)
 
 # combs = 9*8*7*6*5*4*3*2
 # combs *= 4**9
