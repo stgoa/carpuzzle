@@ -1,111 +1,181 @@
+from __future__ import annotations
+from typing import Iterable
 import numpy as np
 import pandas as pd
 
 
-class Square:
-	"""
-	Object used to represent one squared tile of the puzzle. 
 
-	Each Square has one label in each of its four sides. This labels are stored in a list of strings
-
+class CarSlice:
+	"""Represents a car slice within the tiles' borders
 	"""
-	def __init__(self, borders, id="0"):
-		self.borders = borders #N W S E
+	def __init__(self, color:str, car_type:str) -> None:
+		"""Initialize the class
+
+		Args:
+			color (str): string representing the color of the car: 'R' (red), 'G' (green), 'B' (blue) or 'Y' (yellow)
+			car_type (str): string representing if the car slice is either front ('F') or back ('B')
+		"""
+		self.color = color
+		self.type = car_type
+
+	def __repr__(self) -> str:
+		return self.color + self.type
+
+class Tile:
+	"""Represents a tile of the puzzle
+	"""
+	def __init__(self, borders:list, id:int)->None:
+		"""Initialize the class
+
+		Args:
+			borders (list): list conaining the CarSlice objects in the order [ North (top), West (left), South (bottom),  East (right) ]
+			id (int): unique integer used to identify the tile
+		"""
+		self.borders = borders
 		self.id = id
 	
 	@property
-	def N(self):
+	def N(self)->CarSlice:
+		"""Gets the Northern border
+
+		Returns:
+			CarSlice: Northern border
+		"""
 		return self.borders[0]
 	@property
-	def W(self):
+	def W(self)->CarSlice:
+		"""Gets the Western border
+
+		Returns:
+			CarSlice: Western border
+		"""
 		return self.borders[1]
 	@property
-	def S(self):
+	def S(self)->CarSlice:
+		"""Gets the Southern border
+
+		Returns:
+			CarSlice: Southern border
+		"""
 		return self.borders[2]
 	@property
-	def E(self):
+	def E(self)->CarSlice:
+		"""Gets the Eastern border
+
+		Returns:
+			CarSlice: Eastern border
+		"""
 		return self.borders[3]
 
-	def rotate(self):
-		"""permute cyclically the labels of the sides"""
+	def rotate(self)->None:
+		"""Permutes the list of elements at the borders cyclically"""
 		self.borders = [self.W, self.S, self.E, self.N]   
 		
-	def compare(self, other_square, cardinal_dir):
+	def compare(self, other:Tile, cardinal_dir:Iterable)->bool:
+		"""Determine whether some other Tile can be a neighbors
+
+		Args:
+			other (Tile): Other Tile beign compared to self
+			cardinal_dir (Iterable): tuple indicating the relative direction where the other Tile wants to be placed
+
+		Returns:
+			bool: True if the other tile is compatible with self when placed on the side indicated by cardinal_dir
+		"""
 		cardinal_dir = tuple(cardinal_dir)
 		if cardinal_dir == (1,0):
-			# tengo que comparar mi S con tu N
-			return (self.S[0] == other_square.N[0]) and (self.S[1] != other_square.N[1]) 
+			# compare the Southern border of 'self' with the Northern border of 'other'
+			return (self.S.color == other.N.color) and (self.S.type != other.N.type) 
 		elif cardinal_dir == (-1, 0):
-			# tengo que comparar mi N con tu S
-			return (self.N[0] == other_square.S[0]) and (self.N[1] != other_square.S[1])
+			# compare the Northern border of 'self' with the Southern border of 'other'
+			return (self.N.color == other.S.color) and (self.N.type != other.S.type)
 		elif cardinal_dir == (0,1):
-			# tengo que comparar mi E con tu W
-			return (self.E[0] == other_square.W[0]) and (self.E[1] != other_square.W[1]) 
+			# compare the Eastern border of 'self' with the Western border of 'other'
+			return (self.E.color == other.W.color) and (self.E.type != other.W.type) 
 		elif cardinal_dir == (0,-1):
-			# tengo que comparar mi W con tu E
-			return (self.W[0] == other_square.E[0]) and (self.W[1] != other_square.E[1])
+			# compare the Western border of 'self' with the Eastern border of 'other'
+			return (self.W.color == other.E.color) and (self.W.type != other.E.type)
 
-		else:
-			raise Exception
 	
-	def __repr__(self):
-		string = "  " + self.N + "\n"
-		string += self.W  +"  " +self.E + "\n"
-		string += "  " + self.S
+	def __repr__(self)->str:
+		string = "  " + self.N.__repr__() + "\n"
+		string += self.W.__repr__()  +"  " +self.E.__repr__() + "\n"
+		string += "  " + self.S.__repr__()
 		return string
 	
-	def string_list(self):	 
-		return ["  " + self.N + "  ", self.W + "  " + self.E , "  "+ self.S + "  "]
+	def string_list(self)->list:	 
+		return ["  " + self.N.__repr__() + "  ", self.W.__repr__() + "  " + self.E.__repr__() , "  "+ self.S.__repr__() + "  "]
 	
 class Board:
-	def __init__(self, shape):
-		self.array = np.array([None for i in range(shape[0]*shape[1])]).reshape(shape)
-		self.shape = shape
+	"""Represents the board of the puzzle where the tiles must be placed
+	"""
+	cardinal_dirs = [ np.asarray(tup) for tup in [(1,0), (-1,0), (0,1),(0,-1)]]
+
+	def __init__(self, shape:tuple)->None:
+		"""Initializes the empty board
+
+		Args:
+			shape (tuple): tuple indicating the dimensions of the board: (n rows , n columns)
+		"""
+		self.array = np.array([None for _ in range(shape[0]*shape[1])]).reshape(shape) # initially empty array where the tiles will be placed
+		self.shape = shape # dimensions of the board
+		self.list_pos = [(i,j) for i in range(self.shape[0]) for j in range(self.shape[1])] # list of all coordinates of the board
+
 	
+	def get_adjacent_indices(self, current_pos:tuple)->list:
+		"""Given some coordinates, returns a list of all adjacent coordinates 
+		Args:
+			current_pos (tuple): tuple or coordinates (row, column)
 
-	def get_adjacent_indices(self, current_pos):
-		# returns list of tuples of indices which ...
-		neighbours = []
-		cardinal_dirs = [ np.asarray(tup) for tup in [(1,0), (-1,0), (0,1),(0,-1)]]
-
-		for dir in cardinal_dirs:
-			neighbour = np.asarray(current_pos) + dir # Northern, Southern, Easter and western neighbour
-			if 0<= neighbour[0] < self.shape[0] and 0<= neighbour[1] < self.shape[1]:
-				# neighbour is within bounds of the board
+		Returns:
+			list: list of pairs ('coordinate', 'direction') such that when moving from 'current_pos' in 'direction', one obtains 'coordinate'
+		"""
+		neighbours = [] 
+		for dir in self.cardinal_dirs:
+			neighbour = np.asarray(current_pos) + dir # Northern, Southern, Easter and Western neighbour's coordinates
+			if 0<= neighbour[0] < self.shape[0] and 0<= neighbour[1] < self.shape[1]: # check whether the coordinates are within the bounds of the board
 				neighbours.append((tuple(neighbour), dir))
 		return neighbours
 
-	def is_compatible(self, square, position):
-		"""return True if the square is compatible with the board when fixed in postion for some orientation"""
-		self.array[position] = square
-		for i in range(4):
+	def is_compatible_tile(self, tile:Tile, position:tuple)->bool:
+		"""Checks wheter some tile is compatible with the current state of the board. If there is some compatible orientation of the tile in board, the tile is added to the board
+
+		Args:
+			tile (Tile): tile to be checked
+			position (tuple): position in which the tile wants to be placed
+
+		Returns:
+			bool: True if under some orientation of the tile in the position, the resultant board is compatible. False otherwise.
+		"""
+		self.array[position] = tile
+		for _ in range(4):
 			# each of the four orientations
-			square.rotate()
+			tile.rotate()
 			if self.is_compatible_board():
 				return True
+		# if the tile isn't compatible, remove it from the board
 		self.array[position] = None
 		return False
 
-	def is_compatible_board(self):
-		"""return True if the board is in a compatible configuration"""
+	def is_compatible_board(self)->True:
+		"""Makes around O(N*M*4) comparisons, where N / M are the number of rows / columns
 
-		for i in range(self.shape[0]):
-			for j in range(self.shape[1]):
-				# compare all connections of the square in pos i,j
-				current_pos = (i,j)
-				current_square = self.array[i,j]
+		Returns: True if the board is in a compatible configuration with the current tiles 
+		"""
+		for i,j in self.list_pos:
+			# compare all connections of the tile in pos i,j
+			current_pos = (i,j)
+			current_tile = self.array[i,j]
 
-				if current_square is not None: # is not necessary to check empty entries 
+			if current_tile is not None: # is not necessary to check empty entries of the board
 
-					for (k, l), cardinal_dir in self.get_adjacent_indices(current_pos): # Northern, Southern, Easter and western neighbour
-						adjacent_square = self.array[k,l]
+				for (k, l), cardinal_dir in self.get_adjacent_indices(current_pos): # Northern, Southern, Easter and western neighbour's
 
-						if adjacent_square is not None:
-							
-							if not current_square.compare(adjacent_square,cardinal_dir):
-								"""There is in incompatible conection"""
-								return False
-		# conditions are satisfied
+					adjacent_tile = self.array[k,l]
+
+					if adjacent_tile is not None:
+						if not current_tile.compare(adjacent_tile,cardinal_dir): # check if there is in incompatible conection
+							return False
+		# all connections are compatible
 		return True
 
 	def print_ids(self):
@@ -114,102 +184,97 @@ class Board:
 			string += ",".join([c.id if c is not None else "*" for c in row ])+"\n"
 		print(string)
 		
-	def __repr__(self):
+	def __repr__(self)->str:
 		string = ""
 		for row in self.array:
 			l1 = ""
 			l2 = ""
 			l3 = ""
-			for square in row:
-				if square is None:
+			for tile in row:
+				if tile is None:
 					sl = ["      "," None ", "      "]
 				else:
-					sl = square.string_list()
+					sl = tile.string_list()
 				l1 += sl[0]
 				l2 += sl[1]
 				l3 += sl[2]
 			string += l1 + "\n"+ l2 + "\n" +l3 + "\n"
 		return string
 	
-class Solver:
-	def __init__(self, strategy, path=None, shape=(3,3)):
+class Recursive:
+	"""This class is the actual solver. Handles the initialization and runs the algorithm"""
+	def __init__(self, strategy:list, path:str, shape:tuple=(3,3))->None:
+		"""Initializes the class
+
+		Args:
+			strategy (list): list or coordinates (tuples) indicating the order of fullfilment of the entries of the board.
+			path (str): string with the name of the file with the input data
+			shape (tuple, optional): shape of the board. Defaults to (3,3).
+		"""
 
 		#read csv puzzle
 		df = pd.read_csv(path, sep="\t")
 
-		# populate the squares
-		squares = [] 
+		# populate the tiles
+		tiles = [] 
 		for id, row in df.iterrows():
-			square = Square([row.N, row.W, row.S, row.E], id=str(id))
-			squares.append(square)
-		np.random.shuffle(squares)
+			borders = []
+			for string in [row.N, row.W, row.S, row.E]:
+				carslice = CarSlice(color=string[0], car_type=string[1])
+				borders.append(carslice)
+			tile = Tile(borders=borders, id=str(id))
+			tiles.append(tile)
 
-		#instantiate board
-		self.strategy = strategy
-		self.squares = set(squares) # populate squares
+		#initiallize the board
 		self.board = Board(shape)
 
-		self.counter = 0 # counts the number of recursive calls to measure performance
+		self.tiles = set(tiles) # populate the tiles
+		self.strategy = strategy
+		self.counter = 0
 
 	
-	def depth_search(self, depth = 0, squares_visited = set()):
-		self.counter += 1
+	def depth_search(self, depth:int = 0, tiles_visited:set = set())->bool:
+		"""Depth search first for the finding of a branch of tiles that solves the puzzle
 
-		if depth == len(self.strategy):
+		Args:
+			depth (int, optional): Indicates the current recursion level. Defaults to 0.
+			tiles_visited (set, optional): Set of tiles that already had been visited. Defaults to set().
+
+		Returns:
+			bool: True if such branch has been found, False otherwise.
+		"""
+		self.counter += 1 # count the number of call of the function
+
+		if depth == len(self.strategy): # ending case
 			return True
-		else:
-			pass
-			# print("depth", depth, "pos", self.strategy[depth])
-			# self.board.print_ids()
 
-		current_pos = self.strategy[depth]
+		current_pos = self.strategy[depth] # obtain the coordinates of the next entry of the board to fill
 
-		for square in self.squares - squares_visited:
+		un_visited_tiles = self.tiles - tiles_visited # obtain the set of unvisited tiles
 
-			if self.board.is_compatible(square, current_pos):
-				branch_has_future = self.depth_search(depth = depth+1,squares_visited = squares_visited.union(set([square])))
+		for tile in un_visited_tiles:
+			if self.board.is_compatible_tile(tile, current_pos):
+				# recursive call 
+				branch_has_future = self.depth_search(depth = depth+1,tiles_visited = tiles_visited.union({tile})) # the method 'add' operates inplace, so here we need union
 
 				if branch_has_future:
 					return True
 				else:
+					# delete the tile form the current coordinate being checked
 					self.board.array[current_pos] = None
+
+		# if none of the tiles was fit for the current position, then this branch of exploration has no future
 		return False
 
 
+if __name__ == "__main__":
+	
+	# initialize the solver using the optimal strategy
+	strategy = [(1,1), (0,1), (1,0), (1,2), (2,1), (0,0), (0,2) , (2,0), (2,2)]
+	solver = Recursive(strategy,path = "data.tsv", shape=(3,3))
 
-# initialize the solver
-strategy = [(1,1), (0,1), (1,0), (1,2), (2,1), (0,0), (0,2) , (2,0), (2,2)]
-
-s = Solver(strategy,path = "data.tsv", shape=(3,3))
-
-# run
-s.depth_search()
-
-
-s.board.print_ids()
-print(s.board)
-
-# strategy.reverse()
-
-# suma = 0
-# n=1
-# for i in range(n):
-
-# 	r = Solver(strategy,path = "data.tsv", shape=(3,3))
-
-# 	# run
-# 	r.depth_search()
-# 	print(r.board)
-
-# 	suma += r.counter
-
-# print(suma/n)
-
-# combs = 9*8*7*6*5*4*3*2
-# combs *= 4**9
-
-# print(4 / combs)
-
-#print(r.board.is_compatible_board())
-
-
+	# run
+	solver.depth_search()
+	print(solver.board)
+	print(solver.board.print_ids())
+	print(solver.board.is_compatible_board())
