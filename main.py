@@ -33,6 +33,7 @@ class Tile:
 		"""
 		self.borders = borders
 		self.id = id
+		self.orientation = 0
 	
 	@property
 	def N(self)->CarSlice:
@@ -69,7 +70,8 @@ class Tile:
 
 	def rotate(self)->None:
 		"""Permutes the list of elements at the borders cyclically"""
-		self.borders = [self.W, self.S, self.E, self.N]   
+		self.borders = [self.W, self.S, self.E, self.N] 
+		self.orientation  = (self.orientation + 1 ) % 4
 		
 	def compare(self, other:Tile, cardinal_dir:Iterable)->bool:
 		"""Determine whether some other Tile can be a neighbors
@@ -178,10 +180,17 @@ class Board:
 		# all connections are compatible
 		return True
 
+	def get_permutation(self):
+		pi = []
+		for i in range(self.shape[0]):
+			for j in range(self.shape[1]):
+				pi.append(self.array[i,j].id)
+		return pi 
+			
 	def print_ids(self):
 		string = ""
 		for row in self.array:
-			string += ",".join([c.id if c is not None else "*" for c in row ])+"\n"
+			string += ",".join([str(c.id) if c is not None else "*" for c in row ])+"\n"
 		print(string)
 		
 	def __repr__(self)->str:
@@ -222,7 +231,7 @@ class Recursive:
 			for string in [row.N, row.W, row.S, row.E]:
 				carslice = CarSlice(color=string[0], car_type=string[1])
 				borders.append(carslice)
-			tile = Tile(borders=borders, id=str(id))
+			tile = Tile(borders=borders, id=id)
 			tiles.append(tile)
 
 		#initiallize the board
