@@ -69,19 +69,19 @@ class Tile:
 		return self.borders[3]
 
 	def rotate(self)->None:
-		"""Permutes the list of elements at the borders cyclically"""
+		"""Permutes the list of elements at the borders clockwisely"""
 		self.borders = [self.W, self.S, self.E, self.N] 
 		self.orientation  = (self.orientation + 1 ) % 4
 		
 	def compare(self, other:Tile, cardinal_dir:Iterable)->bool:
-		"""Determine whether some other Tile can be a neighbors
+		"""Determines whether some other Tile can be a neighbor
 
 		Args:
-			other (Tile): Other Tile beign compared to self
+			other (Tile): Other Tile beign compared to 'self'
 			cardinal_dir (Iterable): tuple indicating the relative direction where the other Tile wants to be placed
 
 		Returns:
-			bool: True if the other tile is compatible with self when placed on the side indicated by cardinal_dir
+			bool: True if the other tile is compatible with 'self' when placed on the side indicated by 'cardinal_dir'
 		"""
 		cardinal_dir = tuple(cardinal_dir)
 		if cardinal_dir == (1,0):
@@ -138,28 +138,28 @@ class Board:
 				neighbours.append((tuple(neighbour), dir))
 		return neighbours
 
-	def is_compatible_tile(self, tile:Tile, position:tuple)->bool:
+	def is_compatible_tile(self, tile:Tile, coordinate:tuple)->bool:
 		"""Checks wheter some tile is compatible with the current state of the board. If there is some compatible orientation of the tile in board, the tile is added to the board
 
 		Args:
 			tile (Tile): tile to be checked
-			position (tuple): position in which the tile wants to be placed
+			coordinate (tuple): coordinate in which the tile wants to be placed
 
 		Returns:
-			bool: True if under some orientation of the tile in the position, the resultant board is compatible. False otherwise.
+			bool: True if under some orientation of the tile, in the coordinate the resultant board is compatible. False otherwise.
 		"""
-		self.array[position] = tile
+		self.array[coordinate] = tile #place the tile in the coordinate
 		for _ in range(4):
-			# each of the four orientations
+			# for each of the four possible orientations of the tile
 			tile.rotate()
-			if self.is_compatible_board():
-				return True
+			if self.is_compatible_board(): #check if the resultant board is compatible
+				return True # in that case return True
 		# if the tile isn't compatible, remove it from the board
-		self.array[position] = None
-		return False
+		self.array[coordinate] = None
+		return False #...and return False
 
 	def is_compatible_board(self)->True:
-		"""Makes around O(N*M*4) comparisons, where N / M are the number of rows / columns
+		"""Makes approx. O(N*M*4) comparisons, where N / M are the number of rows / columns
 
 		Returns: True if the board is in a compatible configuration with the current tiles 
 		"""
@@ -170,7 +170,7 @@ class Board:
 
 			if current_tile is not None: # is not necessary to check empty entries of the board
 
-				for (k, l), cardinal_dir in self.get_adjacent_indices(current_pos): # Northern, Southern, Easter and western neighbour's
+				for (k, l), cardinal_dir in self.get_adjacent_indices(current_pos): # Northern, Southern, Easter and Western neighbour's
 
 					adjacent_tile = self.array[k,l]
 
