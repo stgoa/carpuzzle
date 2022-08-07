@@ -1,0 +1,40 @@
+[tool.poetry]
+name ="carpuzzle"
+version = "0.1.0"
+description = "Python solver for a combinatorial puzzle"
+authors = ["Santiago Armstrong <santiagoarmstrong@gmail.com>"]
+
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.12"
+scipy = "^1.9.0"
+numpy = "^1.23.1"
+pandas = "^1.4.3"
+matplotlib = "^3.5.2"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+autopep8 = "^1.5.4"
+docformatter = "^1.4"
+pylint = "^2.6.0"
+flake8 = "3.8.4"
+mypy = "^0.800"
+isort = "^5.7.0"
+bandit = "^1.7.0"
+black = "20.8b1"
+ipykernel = "^6.15.1"
+
+[tool.black]
+line-length = 79
+
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+# This could be using poetry build backend 
+#[build-system]
+#requires = ["poetry_core>=1.0.0"]
+#build-backend = "poetry.core.masonry.api"
