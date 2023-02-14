@@ -9,8 +9,9 @@ class CarSlice:
 			color (str): string representing the color of the car: 'R' (red), 'G' (green), 'B' (blue) or 'Y' (yellow)
 			car_type (str): string representing if the car slice is either front ('F') or back ('B')
 		"""
-		self.color = color
-		self.type = car_type
+		self.color = color 
+		self.type = car_type 
 
 	def __repr__(self) -> str:
-		return self.color + self.type
+		"""Returns a string representation of the car slice"""
+		return self.color + self.type 

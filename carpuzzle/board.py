@@ -5,10 +5,11 @@ import pandas as pd
 
 from carpuzzle.tile import Tile
 
+
 class Board:
 	"""Represents the board of the puzzle where the tiles must be placed
 	"""
-	cardinal_dirs = [ np.asarray(tup) for tup in [(1,0), (-1,0), (0,1),(0,-1)]]
+	cardinal_dirs = [ np.asarray(tup) for tup in [(1,0), (-1,0), (0,1),(0,-1)]] # list of the cardinal directions
 
 	def __init__(self, shape:tuple)->None:
 		"""Initializes the empty board
@@ -16,13 +17,14 @@ class Board:
 		Args:
 			shape (tuple): tuple indicating the dimensions of the board: (n rows , n columns)
 		"""
-		self.array = np.array([None for _ in range(shape[0]*shape[1])]).reshape(shape) # initially empty array where the tiles will be placed
-		self.shape = shape # dimensions of the board
-		self.list_pos = [(i,j) for i in range(self.shape[0]) for j in range(self.shape[1])] # list of all coordinates of the board
+		self.array = np.array([None for _ in range(shape[0]*shape[1])]).reshape(shape) # initially empty array of the board, where the tiles will be placed
+		self.shape = shape # shape of the board
+		self.list_pos = [(i,j) for i in range(self.shape[0]) for j in range(self.shape[1])] # list of all the coordinates of the board
 
 	
 	def get_adjacent_indices(self, current_pos:tuple)->list:
-		"""Given some coordinates, returns a list of all adjacent coordinates 
+		""" Returns the coordinates of the adjacent tiles to the current position
+
 		Args:
 			current_pos (tuple): tuple or coordinates (row, column)
 
@@ -46,18 +48,18 @@ class Board:
 		Returns:
 			bool: True if under some orientation of the tile, in the coordinate the resultant board is compatible. False otherwise.
 		"""
-		self.array[coordinate] = tile #place the tile in the coordinate
+		self.array[coordinate] = tile # add the tile to the board
 		for _ in range(4):
 			# for each of the four possible orientations of the tile
 			tile.rotate()
-			if self.is_compatible_board(): #check if the resultant board is compatible
+			if self.is_compatible_board(): # check if the resultant board is compatible
 				return True # in that case return True
 		# if the tile isn't compatible, remove it from the board
 		self.array[coordinate] = None
 		return False #...and return False
 
 	def is_compatible_board(self)->True:
-		"""Makes approx. O(N*M*4) comparisons, where N / M are the number of rows / columns
+		""" Checks whether the current state of the board is compatible. Makes approx. O(N*M*4) comparisons, where N / M are the number of rows / columns
 
 		Returns: True if the board is in a compatible configuration with the current tiles 
 		"""
@@ -79,6 +81,7 @@ class Board:
 		return True
 
 	def get_permutation(self):
+		"""Auxiliary function that returns the permutation coresponding to the tiles in the board. We use the id of each tile as the permutation element. This is used to rearange the tiles in the board to the correct order"""
 		pi = []
 		for i in range(self.shape[0]):
 			for j in range(self.shape[1]):
@@ -86,12 +89,16 @@ class Board:
 		return pi 
 			
 	def print_ids(self):
+		"""Prints the id of each tile in the board. If there is no tile in a position, prints a *
+		"""
 		string = ""
 		for row in self.array:
 			string += ",".join([str(c.id) if c is not None else "*" for c in row ])+"\n"
 		print(string)
 		
 	def __repr__(self)->str:
+		"""Returns a string representation of the board
+		"""
 		string = ""
 		for row in self.array:
 			l1 = ""

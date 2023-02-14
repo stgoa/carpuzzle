@@ -1,6 +1,9 @@
 from __future__ import annotations
-from carpuzzle.slice import CarSlice
+
 from typing import Iterable
+
+from carpuzzle.slice import CarSlice
+
 
 class Tile:
 	"""Represents a tile of the puzzle
@@ -55,7 +58,7 @@ class Tile:
 		self.orientation  = (self.orientation + 1 ) % 4
 		
 	def compare(self, other:Tile, cardinal_dir:Iterable)->bool:
-		"""Determines whether some other Tile can be a neighbor
+		""" Determines whether some other Tile can be a neighbor by comparing the borders of 'self' with the borders of 'other' in the direction indicated by 'cardinal_dir'. 
 
 		Args:
 			other (Tile): Other Tile beign compared to 'self'
@@ -80,10 +83,13 @@ class Tile:
 
 	
 	def __repr__(self)->str:
+		"""Returns a string representation of the Tile
+		"""
 		string = "  " + self.N.__repr__() + "\n"
 		string += self.W.__repr__()  +"  " +self.E.__repr__() + "\n"
 		string += "  " + self.S.__repr__()
 		return string
 	
-	def string_list(self)->list:	 
+	def string_list(self)->list:
+		"""Returns a list of strings representing the Tile""" 
 		return ["  " + self.N.__repr__() + "  ", self.W.__repr__() + "  " + self.E.__repr__() , "  "+ self.S.__repr__() + "  "]
