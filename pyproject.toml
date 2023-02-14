@@ -6,11 +6,11 @@ authors = ["Santiago Armstrong <santiagoarmstrong@gmail.com>"]
 
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.12"
-scipy = "^1.9.0"
-numpy = "^1.23.1"
-pandas = "^1.4.3"
-matplotlib = "^3.5.2"
+python = ">=3.8,<3.12"
+scipy = ">=1.9.0"
+numpy = ">=1.23.1"
+pandas = ">=1.4.3"
+matplotlib = ">=3.5.2"
 
 
 [tool.poetry.dev-dependencies]
@@ -19,7 +19,6 @@ autopep8 = "^1.5.4"
 docformatter = "^1.4"
 pylint = "^2.6.0"
 flake8 = "3.8.4"
-mypy = "^0.800"
 isort = "^5.7.0"
 bandit = "^1.7.0"
 black = "20.8b1"
