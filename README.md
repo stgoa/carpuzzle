@@ -25,7 +25,7 @@ Combining the two previous results we have that there are $4^9\cdot 9!$ possible
 
 **Naïve Approach:**
 
-The simplest idea would be to try the combinations one by one until a solution is found (will this solution be unique?). Now, $95$ billion configurations rules out this alternative unless you have a supercomputer (to divide the task between different cores). We note that even if checking the admissibility of each configuration took $0.01$ seconds, in the worst case we would have to wait $30$ years.
+The simplest idea would be to try the combinations one by one until a solution is found (will this solution be unique?). Now, $95$ billion configurations rules out this alternative unless you have a supercomputer (to divide the task between different cores). We note that even if checking the admissibility of each configuration took $0.01$ seconds, in the worst case we would have to wait [$30$ years](https://www.google.com/search?q=(4%5E9)*(9!)*0.01+seconds+to+years&rlz=1C5CHFA_enCL1033CL1033&oq=(4%5E9)*(9!)*0.01+seconds+to+years&aqs=chrome.0.69i59j6.4153j0j7&sourceid=chrome&ie=UTF-8).
 
 ## The code
 
