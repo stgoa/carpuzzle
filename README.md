@@ -31,7 +31,9 @@ The simplest idea would be to try the combinations one by one until a solution i
 
 In this python repository I implemented (just for fun) a [backtracking](https://en.wikipedia.org/wiki/Backtracking) solution to the puzzle which is extensively documented. You are very welcome to take a look.
 
-There is an example using the actual images of the puzzle in the notebook [visualizations.ipynb](visualization.ipynb)
+There is an example using the actual images of the puzzle in the notebook [visualizations.ipynb](visualization.ipynb). The solution found by the algorithm is the following:
+
+![solution](data/imgs/solution.png) 
 
 ### TODO:
 
